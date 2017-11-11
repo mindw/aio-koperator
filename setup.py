@@ -22,6 +22,7 @@ setuptools.setup(
         'aiohttp-jinja2<1.0',
         'prometheus_async==17.5.0',
         'click >= 6.7, <=7',
+        'kubernetes==4.0.0b1',
         'click-log'
     ],
 

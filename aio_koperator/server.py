@@ -4,8 +4,11 @@ import logging
 from . import __version__
 from aiohttp import web
 from prometheus_async.aio.web import server_stats
+import asyncio
+from kubernetes import client, config, watch
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 click_log.basic_config(logger)
 
 
@@ -22,6 +25,32 @@ async def _cheap(request):
     return web.Response(text=_REF, content_type='text/html')
 
 
+async def healthz(request):
+
+    logger.info('healthz')
+    return web.HTTPOk()
+
+
+async def pods():
+    config.load_kube_config()
+
+    v1 = client.CoreV1Api()
+
+    w = watch.Watch()
+    for event in w.stream(v1.list_pod_for_all_namespaces):
+        logger.info(f"Event: {event['type']} {event['object'].kind} {event['object'].metadata.name}")
+        await asyncio.sleep(0)
+
+
+async def start_background_tasks(app):
+    app['redis_listener'] = app.loop.create_task(pods())
+
+
+async def cleanup_background_tasks(app):
+    app['redis_listener'].cancel()
+    await app['redis_listener']
+
+
 def create_app(loop=None):
     app = web.Application(loop=loop)
     app.router.add_get('/healthz', healthz)
@@ -29,13 +58,10 @@ def create_app(loop=None):
     # Catch all requests
     app.router.add_get('/', _cheap)
 
+    app.on_startup.append(start_background_tasks)
+    app.on_cleanup.append(cleanup_background_tasks)
+
     return app
-
-
-async def healthz(request):
-
-    logger.info('healthz')
-    return web.HTTPOk()
 
 
 @click.command()
