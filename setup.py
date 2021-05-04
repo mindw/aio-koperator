@@ -16,13 +16,13 @@ setuptools.setup(
     python_requires='>=3.6',
 
     install_requires=[
-        'aiohttp==2.3.2',
+        'aiohttp==3.7.4',
         'cchardet<3',
         'uvloop<1.0;platform_system!="Windows"',
-        'aiohttp-jinja2<1.0',
-        'prometheus_async==17.5.0',
-        'click >= 6.7, <=7',
-        'kubernetes==4.0.0b1',
+        'aiohttp-jinja2<2',
+        'prometheus_async==19.2.0',
+        'click >= 7, <=8',
+        'kubernetes==12.0.1',
         'click-log'
     ],
 
