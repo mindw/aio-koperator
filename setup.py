@@ -16,7 +16,7 @@ setuptools.setup(
     python_requires='>=3.6',
 
     install_requires=[
-        'aiohttp==3.7.4',
+        'aiohttp==3.8.5',
         'cchardet<3',
         'uvloop<1.0;platform_system!="Windows"',
         'aiohttp-jinja2<2',
